@@ -2,6 +2,7 @@ package com.vikas.airline.service;
 
 import com.vikas.airline.dto.request.ChangePasswordRequest;
 import com.vikas.airline.dto.request.UpdateUserRequest;
+import com.vikas.airline.dto.request.UpdateUserRoleRequest;
 import com.vikas.airline.dto.response.UserResponse;
 import com.vikas.airline.entity.User;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,8 @@ public interface UserService {
     UserResponse getCurrentUser();
 
     UserResponse updateCurrentUser(UpdateUserRequest request);
+
+    UserResponse updateUserRole(Long userId, UpdateUserRoleRequest request);
 
     void changePassword(ChangePasswordRequest request);
 

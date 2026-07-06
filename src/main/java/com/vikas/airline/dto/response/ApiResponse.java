@@ -1,33 +1,34 @@
 package com.vikas.airline.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-
+import lombok.*;
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Schema(description = "Standard API Response Wrapper")
-public record ApiResponse<T>(
+public class ApiResponse<T> {
 
-        @Schema(example = "true")
-        boolean success,
-
-        @Schema(example = "Operation completed successfully.")
-        String message,
-
-        @Schema(description = "Response payload")
-        T data,
-
-        @Schema(example = "2026-07-05T20:45:30")
-        LocalDateTime timestamp
-
-) {
+    private boolean success;
+    private String message;
+    private T data;
+    private LocalDateTime timestamp;
 
 
-     //Success response with data.
+    //Success response with data only.
+    public static <T> ApiResponse<T> success(T data) {
+        return ApiResponse.<T>builder()
+                .success(true)
+                .message("Operation completed successfully.")
+                .data(data)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 
+    //Success response with custom message and data.
     public static <T> ApiResponse<T> success(
             String message,
             T data
@@ -40,27 +41,31 @@ public record ApiResponse<T>(
                 .build();
     }
 
-
-     //Success response without data.
-
+    //Success response with message only.
     public static <T> ApiResponse<T> success(
             String message
     ) {
-        return success(message, null);
+        return ApiResponse.<T>builder()
+                .success(true)
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 
 
-     //Failure response without data.
-
+    //Failure response with message only.
     public static <T> ApiResponse<T> failure(
             String message
     ) {
-        return failure(message, null);
+        return ApiResponse.<T>builder()
+                .success(false)
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 
 
-     //Failure response with additional data(useful for validation errors).
-
+    //Failure response with message and additional data (typically validation errors).
     public static <T> ApiResponse<T> failure(
             String message,
             T data
@@ -72,5 +77,4 @@ public record ApiResponse<T>(
                 .timestamp(LocalDateTime.now())
                 .build();
     }
-
 }

@@ -2,6 +2,7 @@ package com.vikas.airline.service.impl;
 
 import com.vikas.airline.dto.request.ChangePasswordRequest;
 import com.vikas.airline.dto.request.UpdateUserRequest;
+import com.vikas.airline.dto.request.UpdateUserRoleRequest;
 import com.vikas.airline.dto.response.UserResponse;
 import com.vikas.airline.entity.User;
 import com.vikas.airline.exception.BadRequestException;
@@ -202,7 +203,9 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public User getAuthenticatedUserEntity() {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
 
         if (authentication == null
                 || !authentication.isAuthenticated()
@@ -219,14 +222,10 @@ public class UserServiceImpl implements UserService {
                         new ResourceNotFoundException("User",email));
 
         if (!user.isActive()) {
-            throw new BadRequestException(
-                    "User account is disabled."
-            );
+            throw new BadRequestException("User account is disabled.");
         }
 
         return user;
-
-
     }
 
     private User findUserById(Long id){
@@ -239,5 +238,25 @@ public class UserServiceImpl implements UserService {
                         ));
     }
 
+    @Override
+    public UserResponse updateUserRole(
+            Long userId,
+            UpdateUserRoleRequest request
+    ) {
+
+        User user = findUserById(userId);
+
+        userMapper.updateRoleFromRequest(request, user);
+
+        User updated = userRepository.save(user);
+
+        log.info(
+                "User role updated. UserId={}, NewRole={}",
+                updated.getId(),
+                updated.getRole()
+        );
+
+        return userMapper.toResponse(updated);
+    }
 
 }

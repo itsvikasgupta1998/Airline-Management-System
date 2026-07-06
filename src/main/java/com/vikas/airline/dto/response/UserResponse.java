@@ -1,25 +1,18 @@
 package com.vikas.airline.dto.response;
 
 import com.vikas.airline.enums.Role;
+import lombok.*;
 
-import java.time.LocalDateTime;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserResponse {
 
-        Long id;
-
-        String fullName;
-
-        String email;
-
-        Role role;
-
-        boolean active;
-
-    LocalDateTime createdAt;
-
-    LocalDateTime updatedAt;
-
-
+    private Long id;
+    private String fullName;
+    private String email;
+    private Role role;
+    private boolean active;
 }
-

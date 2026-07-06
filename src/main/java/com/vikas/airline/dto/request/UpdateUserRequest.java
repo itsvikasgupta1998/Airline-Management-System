@@ -1,26 +1,22 @@
 package com.vikas.airline.dto.request;
 
-import com.vikas.airline.enums.Role;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Builder
-public class UpdateUserRequest
-{
+@Getter
+@Setter
+@NoArgsConstructor
+public class UpdateUserRequest {
 
     @NotBlank(message = "Full name is required.")
-    @Size(max = 100, message = "Full name cannot exceed 100 characters.")
-    String fullName;
-
-    @NotNull(message = "Role is required.")
-    Role role;
+    @Size(
+            min = 3,
+            max = 100,
+            message = "Full name must be between 3 and 100 characters."
+    )
+    private String fullName;
 
 }
-
-
-
-
-
-
