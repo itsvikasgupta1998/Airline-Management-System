@@ -37,11 +37,19 @@ public class Flight extends BaseEntity {
     @Column(name = "flight_number", nullable = false, length = 20)
     private String flightNumber;
 
-    @Column(nullable = false, length = 50)
-    private String source;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "source_airport_id",
+            nullable = false
+    )
+    private Airport sourceAirport;
 
-    @Column(nullable = false, length = 50)
-    private String destination;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "destination_airport_id",
+            nullable = false
+    )
+    private Airport destinationAirport;
 
     @Column(name = "departure_date", nullable = false)
     private LocalDate departureDate;
@@ -87,4 +95,9 @@ public class Flight extends BaseEntity {
             orphanRemoval = true
     )
     private List<Seat> seats = new ArrayList<>();
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean active = true;
+
 }

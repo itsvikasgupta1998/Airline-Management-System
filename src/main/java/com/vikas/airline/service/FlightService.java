@@ -1,10 +1,16 @@
 package com.vikas.airline.service;
 
-import com.vikas.airline.dto.response.FlightResponse;
-import com.vikas.airline.dto.request.FlightSearchRequest;
 
-import java.util.List;
+import com.vikas.airline.dto.request.FlightSearchRequest;
+import com.vikas.airline.dto.response.FlightResponse;
+import org.springframework.data.domain.Page;
 
 public interface FlightService {
-    List<FlightResponse> searchFlights(FlightSearchRequest request);
+    Page<FlightResponse> searchFlights(
+            FlightSearchRequest request,
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
+    );
 }

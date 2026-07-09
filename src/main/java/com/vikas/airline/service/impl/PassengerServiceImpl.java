@@ -21,8 +21,8 @@ public class PassengerServiceImpl implements PassengerService {
     private final PassengerRepository passengerRepo;
     private final BaggageRepository baggageRepo;
 
-    @Override
     @Transactional
+    @Override
     public PassengerInfoResponse savePassengerInfo(PassengerInfoRequest req) {
         Seat seat = seatRepo.findById(req.getSeatId())
                 .orElseThrow(() -> new RuntimeException("Seat not found"));
@@ -56,5 +56,20 @@ public class PassengerServiceImpl implements PassengerService {
                 baggage.getTotalWeight(),
                 baggage.isSpecialHandlingRequired()
         );
+    }
+
+    @Override
+    public PassengerInfoResponse createPassenger(PassengerInfoRequest request) {
+        return null;
+    }
+
+    @Override
+    public PassengerInfoResponse getPassenger(Long passengerId) {
+        return null;
+    }
+
+    @Override
+    public PassengerInfoResponse updatePassenger(Long passengerId, PassengerInfoRequest request) {
+        return null;
     }
 }

@@ -8,6 +8,7 @@ import com.vikas.airline.entity.Seat;
 import com.vikas.airline.repository.FlightRepository;
 import com.vikas.airline.service.AdminPassengerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,11 @@ import java.util.List;
 public class AdminPassengerServiceImpl implements AdminPassengerService {
 
     private final FlightRepository flightRepo;
+
+    @Override
+    public Page<PassengerSummaryResponse> getPassengersByFlight(Long flightId, int page, int size, String sortBy, String sortDir) {
+        return null;
+    }
 
     @Override
     public List<PassengerSummaryResponse> getPassengersByFlight(Long flightId) {

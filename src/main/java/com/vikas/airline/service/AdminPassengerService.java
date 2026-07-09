@@ -1,11 +1,23 @@
 package com.vikas.airline.service;
 
 import com.vikas.airline.dto.response.PassengerSummaryResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface AdminPassengerService {
 
-    List<PassengerSummaryResponse> getPassengersByFlight(Long flightId);
+    Page<PassengerSummaryResponse> getPassengersByFlight(
 
+            Long flightId,
+
+            int page,
+
+            int size,
+
+            String sortBy,
+
+            String sortDir
+
+    );
+
+    Object getPassengersByFlight(Long flightId);
 }

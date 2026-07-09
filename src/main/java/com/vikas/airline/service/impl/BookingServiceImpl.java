@@ -73,8 +73,8 @@ public class BookingServiceImpl implements BookingService {
         );
     }
 
-    @Override
     @Transactional
+    @Override
     public BookingResponse cancelBooking(Long bookingId, String userEmail) throws AccessDeniedException {
         Booking booking = bookingRepo.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
@@ -108,5 +108,20 @@ public class BookingServiceImpl implements BookingService {
                 booking.getBookingTime(),
                 booking.getStatus()
         );
+    }
+
+    @Override
+    public BookingResponse createBooking(BookingRequest request) {
+        return null;
+    }
+
+    @Override
+    public BookingResponse getBookingById(Long bookingId) {
+        return null;
+    }
+
+    @Override
+    public BookingResponse cancelBooking(Long bookingId) {
+        return null;
     }
 }

@@ -22,6 +22,6 @@ public class AdminPassengerController {
     @GetMapping("/passengers/{flightId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<PassengerSummaryResponse>> getAllPassengers(@PathVariable Long flightId) {
-        return ResponseEntity.ok(adminPassengerService.getPassengersByFlight(flightId));
+        return ResponseEntity.ok((List<PassengerSummaryResponse>) adminPassengerService.getPassengersByFlight(flightId));
     }
 }

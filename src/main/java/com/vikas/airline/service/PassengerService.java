@@ -2,7 +2,24 @@ package com.vikas.airline.service;
 
 import com.vikas.airline.dto.request.PassengerInfoRequest;
 import com.vikas.airline.dto.response.PassengerInfoResponse;
+import jakarta.transaction.Transactional;
 
 public interface PassengerService {
-    PassengerInfoResponse savePassengerInfo(PassengerInfoRequest request);
+
+    @Transactional
+    PassengerInfoResponse savePassengerInfo(PassengerInfoRequest req);
+
+    PassengerInfoResponse createPassenger(
+            PassengerInfoRequest request
+    );
+
+    PassengerInfoResponse getPassenger(
+            Long passengerId
+    );
+
+    PassengerInfoResponse updatePassenger(
+            Long passengerId,
+            PassengerInfoRequest request
+    );
+
 }

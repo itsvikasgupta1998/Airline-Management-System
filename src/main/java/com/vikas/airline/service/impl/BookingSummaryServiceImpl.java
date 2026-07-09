@@ -5,6 +5,7 @@ import com.vikas.airline.entity.Payment;
 import com.vikas.airline.repository.BookingRepository;
 import com.vikas.airline.service.BookingSummaryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,5 +34,10 @@ public class BookingSummaryServiceImpl implements BookingSummaryService {
                     );
                 }))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<BookingSummaryResponse> getMyBookings(int page, int size, String sortBy, String sortDir) {
+        return null;
     }
 }

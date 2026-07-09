@@ -46,4 +46,8 @@ public class Aircraft extends BaseEntity {
     @OneToOne(mappedBy = "aircraft")
     private Flight flight;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean active = true;
+
 }
