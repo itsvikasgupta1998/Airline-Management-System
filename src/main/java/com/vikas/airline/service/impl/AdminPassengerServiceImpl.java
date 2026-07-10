@@ -29,19 +29,6 @@ public class AdminPassengerServiceImpl implements AdminPassengerService {
         Flight flight = flightRepo.findById(flightId)
                 .orElseThrow(() -> new RuntimeException("Flight not found"));
 
-        return flight.getSeats().stream()
-                .filter(Seat::isBooked)
-                .map(seat -> {
-                    Passenger p = seat.getPassenger();
-                    Baggage b = p.getBaggage();
-                    return new PassengerSummaryResponse(
-                            p.getFullName(),
-                            p.getEmail(),
-                            p.getContactNumber(),
-                            seat.getSeatNumber(),
-                            b.getNumberOfBags(),
-                            b.getTotalWeight()
-                    );
-                }).toList();
+        return null;
     }
 }

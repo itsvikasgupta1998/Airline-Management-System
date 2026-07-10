@@ -37,12 +37,4 @@ public class Refund extends BaseEntity {
     @NotNull
     private String reason;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "booking_id",
-            nullable = false,
-            unique = true
-    )
-    private Booking booking;
-
 }

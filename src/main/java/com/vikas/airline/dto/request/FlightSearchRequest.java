@@ -31,14 +31,12 @@ public class FlightSearchRequest {
 
     @DecimalMin(
             value = "0.0",
-            inclusive = true,
             message = "Minimum fare cannot be negative."
     )
     private BigDecimal minimumFare;
 
     @DecimalMin(
             value = "0.0",
-            inclusive = true,
             message = "Maximum fare cannot be negative."
     )
     private BigDecimal maximumFare;
