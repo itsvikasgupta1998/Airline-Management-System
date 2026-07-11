@@ -1,6 +1,6 @@
 package com.vikas.airline.entity;
 
-import com.vikas.airline.enums.SeatClass;
+import com.vikas.airline.enums.TravelClass;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,7 +31,7 @@ public class Seat extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private SeatClass seatClass;
+    private TravelClass travelClass;
 
     @Column(nullable = false)
     private Boolean booked = false;

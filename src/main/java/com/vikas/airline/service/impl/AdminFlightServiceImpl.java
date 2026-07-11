@@ -1,11 +1,10 @@
 package com.vikas.airline.service.impl;
 
-import com.vikas.airline.dto.request.FlightAssignmentRequest;
 import com.vikas.airline.dto.request.FlightCreateRequest;
 import com.vikas.airline.dto.request.FlightUpdateRequest;
 import com.vikas.airline.dto.response.FlightResponse;
 import com.vikas.airline.entity.*;
-import com.vikas.airline.enums.SeatClass;
+import com.vikas.airline.enums.TravelClass;
 import com.vikas.airline.exception.BadRequestException;
 import com.vikas.airline.exception.ResourceNotFoundException;
 import com.vikas.airline.mapper.FlightMapper;
@@ -27,7 +26,6 @@ public class AdminFlightServiceImpl implements AdminFlightService {
     private final FlightRepository flightRepository;
     private final AircraftRepository aircraftRepository;
     private final AirportRepository airportRepository;
-    private final CrewMemberRepository crewMemberRepository;
     private final SeatRepository seatRepository;
     private final FlightMapper flightMapper;
 
@@ -170,48 +168,6 @@ public class AdminFlightServiceImpl implements AdminFlightService {
         );
     }
 
-    @Override
-    public void assignAircraftAndCrew(
-            FlightAssignmentRequest request
-    ) {
-
-        Flight flight = findFlightById(request.getFlightId());
-
-        Aircraft aircraft = aircraftRepository.findById(request.getAircraftId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Aircraft",
-                                request.getAircraftId()
-                        ));
-
-        flight.setAircraft(aircraft);
-
-        crewMemberRepository.deleteAll(flight.getCrewMembers());
-
-        List<CrewMember> crewMembers =
-                request.getCrewNames()
-                        .stream()
-                        .map(name ->
-                                CrewMember.builder()
-                                        .name(name)
-                                        .role(request.getCrewRole())
-                                        .flight(flight)
-                                        .build()
-                        )
-                        .toList();
-
-        crewMemberRepository.saveAll(crewMembers);
-
-        flight.setCrewMembers(crewMembers);
-
-        flightRepository.save(flight);
-
-        log.info(
-                "Aircraft {} assigned to Flight {}",
-                aircraft.getId(),
-                flight.getFlightNumber()
-        );
-    }
 
     private Flight findFlightById(Long id) {
 
@@ -227,7 +183,7 @@ public class AdminFlightServiceImpl implements AdminFlightService {
                         Seat.builder()
                                 .flight(flight)
                                 .seatNumber("S" + i)
-                                .seatClass(SeatClass.ECONOMY)
+                                .travelClass(TravelClass.ECONOMY)
                                 .price(flight.getFare())
                                 .booked(false)
                                 .build())

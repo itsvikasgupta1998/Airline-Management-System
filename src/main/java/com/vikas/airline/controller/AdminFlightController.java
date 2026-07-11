@@ -1,6 +1,5 @@
 package com.vikas.airline.controller;
 
-import com.vikas.airline.dto.request.FlightAssignmentRequest;
 import com.vikas.airline.dto.request.FlightCreateRequest;
 import com.vikas.airline.dto.request.FlightUpdateRequest;
 import com.vikas.airline.dto.response.ApiResponse;
@@ -62,23 +61,6 @@ public class AdminFlightController {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         "Flight deleted successfully.",
-                        null
-                )
-        );
-    }
-
-    @PostMapping("/assign")
-    public ResponseEntity<ApiResponse<Void>> assignAircraftAndCrew(
-
-            @Valid
-            @RequestBody FlightAssignmentRequest request
-    ) {
-
-        adminFlightService.assignAircraftAndCrew(request);
-
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        "Aircraft assigned successfully.",
                         null
                 )
         );

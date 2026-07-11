@@ -1,6 +1,6 @@
 package com.vikas.airline.dto.response;
 
-import com.vikas.airline.enums.SeatClass;
+import com.vikas.airline.enums.TravelClass;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -16,7 +16,7 @@ public class SeatResponse {
 
     private String seatNumber;
 
-    private SeatClass seatClass;
+    private TravelClass travelClass;
 
     private BigDecimal price;
 

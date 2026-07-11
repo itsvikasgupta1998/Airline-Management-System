@@ -18,7 +18,6 @@ public interface FlightMapper {
     @Mapping(target = "sourceAirport", ignore = true)
     @Mapping(target = "destinationAirport", ignore = true)
     @Mapping(target = "aircraft", ignore = true)
-    @Mapping(target = "crewMembers", ignore = true)
     @Mapping(target = "seats", ignore = true)
 
     Flight toEntity(FlightCreateRequest request);
@@ -43,14 +42,10 @@ public interface FlightMapper {
 
     @Mapping(target = "flightNumber", ignore = true)
     @Mapping(target = "availableSeats", ignore = true)
-
     @Mapping(target = "sourceAirport", ignore = true)
     @Mapping(target = "destinationAirport", ignore = true)
-
     @Mapping(target = "aircraft", ignore = true)
-    @Mapping(target = "crewMembers", ignore = true)
     @Mapping(target = "seats", ignore = true)
-
     @Mapping(target = "fare", source = "fare")
 
     void updateFlightFromRequest(

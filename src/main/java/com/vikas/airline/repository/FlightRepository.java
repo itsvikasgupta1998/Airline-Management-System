@@ -18,16 +18,10 @@ public interface FlightRepository extends
 
 
     boolean existsByFlightNumberAndDepartureDateAndActiveTrue(
-            String flightNumber,
-            LocalDate departureDate
-    );
+            String flightNumber, LocalDate departureDate);
 
     Optional<Flight> findByIdAndActiveTrue(Long id);
 
-    Optional<Flight> findByFlightNumber(String flightNumber);
 
-    Page<Flight> findByDepartureDateGreaterThanEqual(
-            LocalDate departureDate,
-            Pageable pageable);
 
 }

@@ -16,10 +16,6 @@ public interface AirportRepository extends
 
     Optional<Airport> findByIdAndActiveTrue(Long id);
 
-    Optional<Airport> findByIataCodeIgnoreCaseAndActiveTrue(String iataCode);
-
-    Optional<Airport> findByIcaoCodeIgnoreCaseAndActiveTrue(String icaoCode);
-
     boolean existsByIataCodeIgnoreCaseAndActiveTrue(String iataCode);
 
     boolean existsByIcaoCodeIgnoreCaseAndActiveTrue(String icaoCode);

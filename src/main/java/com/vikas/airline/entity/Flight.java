@@ -80,13 +80,6 @@ public class Flight extends BaseEntity {
     )
     private Aircraft aircraft;
 
-    @Builder.Default
-    @OneToMany(
-            mappedBy = "flight",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<CrewMember> crewMembers = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(
