@@ -1,10 +1,7 @@
 package com.vikas.airline.service.impl;
 
 import com.vikas.airline.dto.response.PassengerSummaryResponse;
-import com.vikas.airline.entity.Baggage;
 import com.vikas.airline.entity.Flight;
-import com.vikas.airline.entity.Passenger;
-import com.vikas.airline.entity.Seat;
 import com.vikas.airline.repository.FlightRepository;
 import com.vikas.airline.service.AdminPassengerService;
 import lombok.RequiredArgsConstructor;

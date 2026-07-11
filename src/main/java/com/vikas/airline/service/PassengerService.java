@@ -1,25 +1,39 @@
 package com.vikas.airline.service;
 
-import com.vikas.airline.dto.request.PassengerInfoRequest;
-import com.vikas.airline.dto.response.PassengerInfoResponse;
-import jakarta.transaction.Transactional;
+import com.vikas.airline.dto.request.CreatePassengerRequest;
+import com.vikas.airline.dto.request.PassengerSearchRequest;
+import com.vikas.airline.dto.request.UpdatePassengerRequest;
+import com.vikas.airline.dto.response.PassengerResponse;
+import org.springframework.data.domain.Page;
 
 public interface PassengerService {
 
-    @Transactional
-    PassengerInfoResponse savePassengerInfo(PassengerInfoRequest req);
+    PassengerResponse createPassenger(CreatePassengerRequest request);
 
-    PassengerInfoResponse createPassenger(
-            PassengerInfoRequest request
+    PassengerResponse getPassengerById(Long passengerId);
+
+    Page<PassengerResponse> getAllPassengers(
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
     );
 
-    PassengerInfoResponse getPassenger(
-            Long passengerId
-    );
-
-    PassengerInfoResponse updatePassenger(
+    PassengerResponse updatePassenger(
             Long passengerId,
-            PassengerInfoRequest request
+            UpdatePassengerRequest request
+    );
+
+    void deletePassenger(Long passengerId);
+
+    void restorePassenger(Long passengerId);
+
+    Page<PassengerResponse> searchPassengers(
+            PassengerSearchRequest request,
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
     );
 
 }

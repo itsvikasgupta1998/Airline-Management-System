@@ -14,7 +14,7 @@ import java.util.List;
         name = "flights",
         indexes = {
                 @Index(name = "idx_flight_number", columnList = "flight_number"),
-                @Index(name = "idx_route", columnList = "source,destination"),
+                @Index(name = "idx_route", columnList = "source_airport_id,destination_airport_id"),
                 @Index(name = "idx_departure_date", columnList = "departure_date")
         },
         uniqueConstraints = {
