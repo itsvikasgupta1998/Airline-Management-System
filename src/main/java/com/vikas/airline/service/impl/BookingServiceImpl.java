@@ -7,13 +7,13 @@ import com.vikas.airline.dto.request.UpdateBookingRequest;
 import com.vikas.airline.dto.response.BookingResponse;
 import com.vikas.airline.entity.*;
 import com.vikas.airline.enums.BookingStatus;
-import com.vikas.airline.enums.PaymentStatus;
 import com.vikas.airline.enums.TravelClass;
 import com.vikas.airline.exception.BadRequestException;
 import com.vikas.airline.exception.ResourceNotFoundException;
 import com.vikas.airline.mapper.BookingMapper;
 import com.vikas.airline.repository.*;
 import com.vikas.airline.service.BookingService;
+import com.vikas.airline.service.PaymentService;
 import com.vikas.airline.specification.BookingSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,9 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,6 +38,7 @@ public class BookingServiceImpl implements BookingService {
     private final PassengerRepository passengerRepository;
     private final SeatRepository seatRepository;
     private final UserRepository userRepository;
+    private final PaymentService paymentService;
 
 
     @Override
@@ -248,9 +247,6 @@ public class BookingServiceImpl implements BookingService {
         validateFlightDepartureForCancellation(
                 booking.getFlight());
 
-        BigDecimal refund =
-                calculateRefund(booking);
-
         releaseSeat(booking.getSeat());
 
         incrementFlightAvailability(
@@ -265,20 +261,13 @@ public class BookingServiceImpl implements BookingService {
         booking.setCancellationReason(
                 request.getCancellationReason());
 
-        booking.setRefundAmount(refund);
+        Booking savedBooking = bookingRepository.save(booking);
 
-        booking.setRefundProcessedAt(
-                LocalDateTime.now());
+        paymentService.processRefund(savedBooking.getId(),
+                request.getCancellationReason());
 
-        booking.setPaymentStatus(
-                resolvePaymentStatus(refund));
-
-        Booking saved =
-                bookingRepository.save(booking);
-
-        return bookingMapper.toResponse(saved);
+        return bookingMapper.toResponse(savedBooking);
     }
-
 
 
                         /**   HELPER METHODS  **/
@@ -419,7 +408,6 @@ public class BookingServiceImpl implements BookingService {
                 .user(user)
                 .travelClass(request.getTravelClass())
                 .bookingStatus(BookingStatus.CONFIRMED)
-                .paymentStatus(PaymentStatus.PENDING)
                 .bookingDate(LocalDateTime.now())
                 .baseFare(baseFare)
                 .tax(tax)
@@ -665,61 +653,11 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime departure = LocalDateTime.of(
 
                 flight.getDepartureDate(),
-
                 flight.getDepartureTime());
 
         if(LocalDateTime.now().isAfter(departure)){
-
-            throw new BadRequestException(
-
-                    "Cannot cancel booking after flight departure.");
+            throw new BadRequestException("Cannot cancel booking after flight departure.");
         }
-    }
-
-    private BigDecimal calculateRefund(
-            Booking booking){
-
-        LocalDateTime departure = LocalDateTime.of(
-
-                booking.getFlight().getDepartureDate(),
-
-                booking.getFlight().getDepartureTime());
-
-        long hours = Duration.between(
-                        LocalDateTime.now(),
-                        departure).toHours();
-
-        BigDecimal fare = booking.getTotalFare();
-
-        if(hours>=72){
-
-            return fare;
-        }
-
-        if(hours>=24){
-
-            return fare.multiply(
-                    new BigDecimal("0.80"));
-        }
-
-        if(hours>=6){
-
-            return fare.multiply(
-                    new BigDecimal("0.50"));
-        }
-
-        return BigDecimal.ZERO;
-    }
-
-    private PaymentStatus resolvePaymentStatus(
-            BigDecimal refund){
-
-        if(refund.compareTo(BigDecimal.ZERO)==0){
-
-            return PaymentStatus.NON_REFUNDABLE;
-        }
-
-        return PaymentStatus.REFUNDED;
     }
 
 }

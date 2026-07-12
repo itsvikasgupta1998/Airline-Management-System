@@ -2,8 +2,7 @@ package com.vikas.airline.enums;
 
 public enum PaymentMethod {
 
-    CREDIT_CARD,
-    DEBIT_CARD,
+    CARD,
     UPI,
     NET_BANKING,
     WALLET

@@ -75,14 +75,6 @@ public class Booking extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(
-            name = "payment_status",
-            nullable = false,
-            length = 20
-    )
-    private PaymentStatus paymentStatus;
-
-    @Enumerated(EnumType.STRING)
-    @Column(
             name = "travel_class",
             nullable = false,
             length = 30
@@ -155,16 +147,9 @@ public class Booking extends BaseEntity {
     )
     private Passenger passenger;
 
+
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "seat_id",
-            foreignKey = @ForeignKey(name = "fk_booking_seat")
-    )
+    @JoinColumn(name = "seat_id", foreignKey = @ForeignKey(name = "fk_booking_seat"))
     private Seat seat;
 
-    @Column(name = "refund_amount", precision = 10, scale = 2)
-    private BigDecimal refundAmount;
-
-    @Column(name = "refund_processed_at")
-    private LocalDateTime refundProcessedAt;
 }
