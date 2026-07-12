@@ -216,7 +216,7 @@ http://localhost:8080/swagger-ui/index.html
 
 | Technology | Version |
 |------------|----------|
-| Java | 21 |
+| Java | 17 |
 | Spring Boot | 3.x |
 | Spring Security | Latest |
 | JWT | Latest |
