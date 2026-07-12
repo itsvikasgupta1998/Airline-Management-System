@@ -15,6 +15,7 @@ import com.vikas.airline.mapper.PaymentMapper;
 import com.vikas.airline.repository.BookingRepository;
 import com.vikas.airline.repository.PaymentRepository;
 import com.vikas.airline.service.PaymentService;
+import com.vikas.airline.service.TicketService;
 import com.vikas.airline.specification.PaymentSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final PaymentMapper paymentMapper;
+    private final TicketService ticketService;
 
     @Override
     @Transactional
@@ -46,28 +48,23 @@ public class PaymentServiceImpl implements PaymentService {
         Booking booking = getActiveBooking(request.getBookingId());
         validateBookingEligibleForPayment(booking);
         validateDuplicatePayment(booking);
-        Payment payment = buildPayment(
-                booking,
-                request);
+        Payment payment = buildPayment(booking, request);
 
         Payment savedPayment = paymentRepository.save(payment);
+        // Generate E-Ticket after successful payment
+        ticketService.generateTicket(savedPayment.getBooking().getId());
         return paymentMapper.toResponse(savedPayment);
     }
 
     @Override
     @Transactional
-    public PaymentResponse updatePayment(
-            Long id,
-            UpdatePaymentRequest request) {
+    public PaymentResponse updatePayment(Long id, UpdatePaymentRequest request) {
 
         Payment payment = getActivePayment(id);
-
         validatePaymentEditable(payment);
 
         if (request.getPaymentMethod() != null) {
-
-            payment.setPaymentMethod(
-                    request.getPaymentMethod());
+            payment.setPaymentMethod(request.getPaymentMethod());
         }
 
         if (request.getRemarks() != null) {
@@ -75,7 +72,6 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         Payment updatedPayment = paymentRepository.save(payment);
-
         return paymentMapper.toResponse(updatedPayment);
     }
 
@@ -248,7 +244,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void processRefund(
-
             Payment payment,
             BigDecimal refundAmount,
             String refundReason) {
@@ -270,6 +265,10 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setPaymentStatus(PaymentStatus.REFUNDED);
 
         paymentRepository.save(payment);
+
+        // Cancel generated ticket
+        ticketService.cancelTicket(
+                payment.getBooking().getId());
     }
 
     private String normalizeRemarks(
