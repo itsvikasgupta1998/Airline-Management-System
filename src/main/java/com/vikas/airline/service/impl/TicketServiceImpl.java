@@ -15,6 +15,7 @@ import com.vikas.airline.mapper.TicketMapper;
 import com.vikas.airline.repository.BookingRepository;
 import com.vikas.airline.repository.PaymentRepository;
 import com.vikas.airline.repository.TicketRepository;
+import com.vikas.airline.service.EmailService;
 import com.vikas.airline.service.TicketService;
 import com.vikas.airline.specification.TicketSpecification;
 import com.vikas.airline.utils.TicketHtmlBuilder;
@@ -42,6 +43,7 @@ public class TicketServiceImpl implements TicketService {
     private final TicketMapper ticketMapper;
     private final TicketPdfGenerator ticketPdfGenerator;
     private final TicketHtmlBuilder ticketHtmlBuilder;
+    private final EmailService emailService;
 
 
     @Override
@@ -240,7 +242,19 @@ public class TicketServiceImpl implements TicketService {
         if (ticket.getTicketStatus() == TicketStatus.CANCELLED) {
             throw new BadRequestException("Cancelled ticket cannot be resent.");
         }
+        if(ticket.getPdfFile()==null){
 
+            throw new BadRequestException(
+                    "Ticket PDF not found."
+            );
+        }
+
+        Booking booking = ticket.getBooking();
+        emailService.sendTicket(booking.getPassenger().getEmail(),
+                booking.getPassenger().getFirstName()
+                        + " "
+                        + booking.getPassenger().getLastName(),
+                ticket.getPdfFile());
     }
 
 

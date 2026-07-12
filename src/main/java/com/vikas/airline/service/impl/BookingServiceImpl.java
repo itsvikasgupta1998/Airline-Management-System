@@ -7,12 +7,14 @@ import com.vikas.airline.dto.request.UpdateBookingRequest;
 import com.vikas.airline.dto.response.BookingResponse;
 import com.vikas.airline.entity.*;
 import com.vikas.airline.enums.BookingStatus;
+import com.vikas.airline.enums.NotificationType;
 import com.vikas.airline.enums.TravelClass;
 import com.vikas.airline.exception.BadRequestException;
 import com.vikas.airline.exception.ResourceNotFoundException;
 import com.vikas.airline.mapper.BookingMapper;
 import com.vikas.airline.repository.*;
 import com.vikas.airline.service.BookingService;
+import com.vikas.airline.service.NotificationService;
 import com.vikas.airline.service.PaymentService;
 import com.vikas.airline.specification.BookingSpecification;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,7 @@ public class BookingServiceImpl implements BookingService {
     private final SeatRepository seatRepository;
     private final UserRepository userRepository;
     private final PaymentService paymentService;
+    private final NotificationService notificationService;
 
 
     @Override
@@ -47,25 +50,15 @@ public class BookingServiceImpl implements BookingService {
             CreateBookingRequest request) {
 
         Flight flight = getActiveFlight(request.getFlightId());
-
         Passenger passenger = getActivePassenger(request.getPassengerId());
-
         Seat seat = getActiveSeat(request.getSeatId());
-
         User user = getUser(request.getUserId());
-
         validateSeatBelongsToFlight(flight, seat);
-
         validatePassport(passenger);
-
         validateSeatAvailability(seat);
-
         validateTravelClass(seat, request);
-
         validatePassengerAlreadyBooked(passenger, flight);
-
         validateFlightDeparture(flight);
-
         Booking booking = buildBooking(
                 request,
                 flight,
@@ -74,10 +67,32 @@ public class BookingServiceImpl implements BookingService {
                 user);
 
         reserveSeat(seat);
-
         updateFlightAvailability(flight);
-
         Booking savedBooking = saveBooking(booking);
+        notificationService.createAndSendNotification(
+                booking.getUser().getId(),
+                booking.getId(),
+                savedBooking.getPassenger().getEmail(),
+
+                "Booking Confirmed",
+
+                """
+                Dear %s,
+        
+                Your booking has been confirmed.
+        
+                Booking Reference : %s
+        
+                Thank you for choosing our Airline.
+                """
+                        .formatted(
+                                savedBooking.getPassenger().getFirstName()
+                                        + " "
+                                        + savedBooking.getPassenger().getLastName(),
+                                savedBooking.getBookingReference()),
+
+                NotificationType.EMAIL
+        );
 
         return bookingMapper.toResponse(savedBooking);
     }
@@ -225,12 +240,7 @@ public class BookingServiceImpl implements BookingService {
                 sortDir);
 
 
-        return bookingRepository.findAll(
-
-                        BookingSpecification.search(request),
-
-                        pageable)
-
+        return bookingRepository.findAll(BookingSpecification.search(request), pageable)
                 .map(bookingMapper::toResponse);
     }
 
@@ -241,30 +251,16 @@ public class BookingServiceImpl implements BookingService {
             CancelBookingRequest request) {
 
         Booking booking = getActiveBooking(id);
-
         validateBookingNotCancelled(booking);
-
-        validateFlightDepartureForCancellation(
-                booking.getFlight());
-
+        validateFlightDepartureForCancellation(booking.getFlight());
         releaseSeat(booking.getSeat());
-
-        incrementFlightAvailability(
-                booking.getFlight());
-
-        booking.setBookingStatus(
-                BookingStatus.CANCELLED);
-
-        booking.setCancelledAt(
-                LocalDateTime.now());
-
-        booking.setCancellationReason(
-                request.getCancellationReason());
+        incrementFlightAvailability(booking.getFlight());
+        booking.setBookingStatus(BookingStatus.CANCELLED);
+        booking.setCancelledAt(LocalDateTime.now());
+        booking.setCancellationReason(request.getCancellationReason());
 
         Booking savedBooking = bookingRepository.save(booking);
-
-        paymentService.processRefund(savedBooking.getId(),
-                request.getCancellationReason());
+        paymentService.processRefund(savedBooking.getId(), request.getCancellationReason());
 
         return bookingMapper.toResponse(savedBooking);
     }

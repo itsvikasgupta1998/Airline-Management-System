@@ -8,12 +8,14 @@ import com.vikas.airline.dto.response.PaymentResponse;
 import com.vikas.airline.entity.Booking;
 import com.vikas.airline.entity.Payment;
 import com.vikas.airline.enums.BookingStatus;
+import com.vikas.airline.enums.NotificationType;
 import com.vikas.airline.enums.PaymentStatus;
 import com.vikas.airline.exception.BadRequestException;
 import com.vikas.airline.exception.ResourceNotFoundException;
 import com.vikas.airline.mapper.PaymentMapper;
 import com.vikas.airline.repository.BookingRepository;
 import com.vikas.airline.repository.PaymentRepository;
+import com.vikas.airline.service.NotificationService;
 import com.vikas.airline.service.PaymentService;
 import com.vikas.airline.service.TicketService;
 import com.vikas.airline.specification.PaymentSpecification;
@@ -39,6 +41,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final BookingRepository bookingRepository;
     private final PaymentMapper paymentMapper;
     private final TicketService ticketService;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -53,6 +56,41 @@ public class PaymentServiceImpl implements PaymentService {
         Payment savedPayment = paymentRepository.save(payment);
         // Generate E-Ticket after successful payment
         ticketService.generateTicket(savedPayment.getBooking().getId());
+        notificationService.createAndSendNotification(
+
+                savedPayment.getBooking().getUser().getId(),
+                savedPayment.getBooking().getId(),
+                savedPayment.getBooking()
+                        .getPassenger()
+                        .getEmail(),
+
+                "Payment Successful",
+
+                """
+                Dear %s,
+        
+                Your payment has been received successfully.
+        
+                Booking Reference : %s
+        
+                Transaction Id : %s
+        
+                Thank you for choosing our Airline.
+                """
+                        .formatted(
+                                savedPayment.getBooking()
+                                        .getPassenger()
+                                        .getFirstName()
+                                        + " "
+                                        + booking.getPassenger().getLastName(),
+
+                                savedPayment.getBooking()
+                                        .getBookingReference(),
+
+                                savedPayment.getTransactionId()),
+
+                NotificationType.EMAIL
+        );
         return paymentMapper.toResponse(savedPayment);
     }
 
@@ -249,26 +287,42 @@ public class PaymentServiceImpl implements PaymentService {
             String refundReason) {
 
         validatePaymentNotRefunded(payment);
-
-        validateRefundAmount(
-
-                payment,
-
-                refundAmount);
-
+        validateRefundAmount(payment, refundAmount);
         payment.setRefundAmount(refundAmount);
-
         payment.setRefundReason(refundReason);
-
         payment.setRefundProcessedAt(LocalDateTime.now());
-
         payment.setPaymentStatus(PaymentStatus.REFUNDED);
-
         paymentRepository.save(payment);
+        Booking booking = payment.getBooking();
+
+        notificationService.createAndSendNotification(
+                booking.getUser().getId(),
+                booking.getId(),
+                booking.getPassenger().getEmail(),
+                "Refund Processed",
+                """
+                Dear %s,
+        
+                Your refund has been processed successfully.
+        
+                Booking Reference : %s
+        
+                Refund Amount : %s
+        
+                Thank you.
+                """
+                        .formatted(
+                                booking.getPassenger().getFirstName()
+                                        + " "
+                                        + booking.getPassenger().getLastName(),
+                                booking.getBookingReference(),
+                                refundAmount
+                        ),
+                NotificationType.EMAIL
+        );
 
         // Cancel generated ticket
-        ticketService.cancelTicket(
-                payment.getBooking().getId());
+        ticketService.cancelTicket(booking.getId());
     }
 
     private String normalizeRemarks(
